@@ -13,11 +13,17 @@ import datetime
 import shutil
 import os
 
-sv = Service('wordcloud', enable_on_default=True)
+sv = Service('词云', enable_on_default=True)
 
-loadpath = ''#此处填gocq的logs路径
-self_id = ''#此处填机器人的QQ号
-load_in_path = ''#此处填词云图片保存的路径
+loadpath = '/home/flandre/桌面/xcw2/cqhttp/logs'	#此处填gocq的logs路径
+self_id = '2979430391'		#此处填机器人的QQ号
+load_in_path = '/home/flandre/桌面/xcw2/HoshinoBot/hoshino/modules/wordcloud-hoshino/wpics'
+
+#此处填词云图片保存的路径
+
+plugin_path = '/home/flandre/桌面/xcw2/HoshinoBot/hoshino/modules/wordcloud-hoshino/'
+
+#本插件所在路径
 
 
 @nonebot.scheduler.scheduled_job(
@@ -39,18 +45,24 @@ async def ciyun(bot, ev: CQEvent):
     match = ev['match']
     month = int(match.group(1))
     day = int(match.group(2))
-    await bot.send(ev,MessageSegment.image(f'file:///{load_in_path}//2021-{month:02}-{day:02}.png'))
+    
+    monthdayQue = os.path.join(load_in_path,f"2021-{month:02}-{day:02}.png") 
+    
+    await bot.send(ev,MessageSegment.image(monthdayQue)) 
 
 @sv.on_fullmatch('生成今日词云')
 async def getciyun(bot, ev: CQEvent):
     if not hoshino.priv.check_priv(ev, hoshino.priv.OWNER):
-        await bot.send(ev,message = '仅限群主可用',at_sender = True)
+        await bot.send(ev,message = '键盘',at_sender = True)
         return
     await bot.send(ev,message = '正在生成本群今日词云，请耐心等待',at_sender = True)
     gid = ev.group_id
     makeclouds(gid)
     today = datetime.date.today().__format__('%Y-%m-%d')
-    await bot.send(ev,MessageSegment.image(f'file:///{load_in_path}//{today}-{gid}.png'))
+    
+    todayGid = os.path.join(load_in_path,f"{today}-{gid}.png") 
+    
+    await bot.send(ev,MessageSegment.image(todayGid))
 
 
 @sv.on_fullmatch('生成昨日词云')
@@ -62,7 +74,10 @@ async def getciyunb(bot, ev: CQEvent):
     gid = ev.group_id
     makecloudsb(gid)
     yesterday = (datetime.date.today() + datetime.timedelta(-1)).__format__('%Y-%m-%d')
-    await bot.send(ev,MessageSegment.image(f'file:///{load_in_path}//{yesterday}-{gid}.png'))
+    
+    yesterdayGid = os.path.join(load_in_path,f"{yesterday}-{gid}.png") 
+    
+    await bot.send(ev,MessageSegment.image(yesterdayGid))
     
 def random_color_func(word=None, font_size=None, position=None,
                       orientation=None, font_path=None, random_state=None):
@@ -73,9 +88,13 @@ def random_color_func(word=None, font_size=None, position=None,
     
 def makeclouds(gid):
     global loadpath
+    global logpath
     bot = nonebot.get_bot()
     today = datetime.date.today().__format__('%Y-%m-%d')
-    f = open(loadpath + f"\\{today}.log", "r", encoding="utf-8")
+  
+    logpath = os.path.join(loadpath,f"{today}.log") 
+    f = open(logpath, "r", encoding="utf-8") #改善读取文件的方式，使其在所用操作系统上可用
+    
     f.seek(0)
     gida = str(gid)
     msg=''
@@ -92,29 +111,41 @@ def makeclouds(gid):
     banword = []#此处为不显示的删除禁词
     ls = jieba.lcut(msg,cut_all=True)#制作分词
     stopwords = set()
-    content = [line.strip() for line in open(load_in_path+f"\\tyc.txt",\
-               encoding='utf-8').readlines()]
+    
+    global tycpath  
+    
+    tycpath = os.path.join(plugin_path,f"tyc.txt")
+    
+    content = [line.strip() for line in open(tycpath,encoding='utf-8').readlines()]
     stopwords.update(content)
     txt = " ".join(ls)
-    w = wordcloud.WordCloud(font_path=load_in_path+f"\\SimHei.ttf",\
+    w = wordcloud.WordCloud(font_path=os.path.join(plugin_path,f"STKAITI.TTF"),\
                             max_words=10000, width=1000, height=700,\
                             background_color='white',stopwords=stopwords,\
                             relative_scaling=0.5,min_word_length=2,\
                             color_func=random_color_func#调色
-        )
+        		    )
+        		    
     w.generate(txt)
     w.to_file(f"{today}-{gid}.png")
     if gid:
         try:
             shutil.move(f"{today}-{gid}.png",load_in_path)
         except:
-            os.remove(load_in_path+f"\\{today}-{gid}.png")
+            #os.remove(load_in_path+f"\\{today}-{gid}.png")
+            
+            os.remove(os.path.join(load_in_path,f"{today}-{gid}.png") )
+            
             shutil.move(f"{today}-{gid}.png",load_in_path)
+            
     else:
         try:
             shutil.move(f"{today}.png",load_in_path)
         except:
-            os.remove(load_in_path+f"\\{today}.png")
+           # os.remove(load_in_path+f"\\{today}.png")
+           
+            os.remove(os.path.join(load_in_path,f"{today}.png") )
+            
             shutil.move(f"{today}.png",load_in_path)
         
         
@@ -140,10 +171,10 @@ def makecloudsb(gid):
     banword = []#此处为不显示的删除禁词
     ls = jieba.lcut(msg)#制作分词
     stopwords = set()
-    content = [line.strip() for line in open(load_in_path+f"\\tyc.txt",encoding='utf-8').readlines()]
+    content = [line.strip() for line in open(tycpath,encoding='utf-8').readlines()]
     stopwords.update(content)
     txt = " ".join(ls)
-    w = wordcloud.WordCloud(font_path=load_in_path+f"\\SimHei.ttf",\
+    w = wordcloud.WordCloud(font_path=os.path.join(plugin_path,f"STKAITI.TTF"),\
                             max_words=10000, width=1000, height=700,\
                             background_color='white',stopwords=stopwords,\
                             relative_scaling=0.5,min_word_length=2,\
@@ -155,11 +186,17 @@ def makecloudsb(gid):
         try:
             shutil.move(f"{yesterday}-{gid}.png",load_in_path)
         except:
-            os.remove(load_in_path+f"\\{yesterday}-{gid}.png")
+            os.remove(os.path.join(load_in_path,f"{yesterday}-{gid}.png") )
+            
             shutil.move(f"{yesterday}-{gid}.png",load_in_path)
     else:
+    
         try:
             shutil.move(f"{yesterday}.png",load_in_path)
         except:
-            os.remove(load_in_path+f"\\{yesterday}.png")
+        
+            os.remove(os.path.join(load_in_path,f"{yesterday}.png") )
+            
             shutil.move(f"{yesterday}.png",load_in_path)
+            
+            
