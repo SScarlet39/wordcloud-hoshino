@@ -1,4 +1,4 @@
-#更新1
+# 更新1
 修复了liunx 下运行路径的问题
 
 # wordcloud-hoshino
