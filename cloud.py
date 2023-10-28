@@ -15,13 +15,19 @@ import os
 
 sv = Service('词云', enable_on_default=True)
 
+plugin_path = '/home/flandre/桌面/xcw2/HoshinoBot/hoshino/modules/wordcloud-hoshino/'
+
 loadpath = '/home/flandre/桌面/xcw2/cqhttp/logs'	#此处填gocq的logs路径
 self_id = '2979430391'		#此处填机器人的QQ号
 load_in_path = '/home/flandre/桌面/xcw2/HoshinoBot/hoshino/modules/wordcloud-hoshino/wpics'
 
+tycpath = os.path.join(plugin_path,f"tyc.txt")
+
+#tycpath = /home/flandre/桌面/xcw2/HoshinoBot/hoshino/modules/wordcloud-hoshino/tyc.txt
+
 #此处填词云图片保存的路径
 
-plugin_path = '/home/flandre/桌面/xcw2/HoshinoBot/hoshino/modules/wordcloud-hoshino/'
+
 
 #本插件所在路径
 
@@ -63,11 +69,10 @@ async def getciyun(bot, ev: CQEvent):
     today = datetime.date.today().__format__('%Y-%m-%d')
     
     todayGid = os.path.join(load_in_path,f"{today}-{gid}.png") 
-    
-     image = open(todayGid,'rb')
-     img_file = f'[CQ:image,file=base64://{base64.b64encode(image.read()).decode()}]'
-     msg = MessageSegment.text("今日词云：") + img_file
-     await bot.send(ev, msg) 
+    image = open(todayGid,'rb')
+    img_file = f'[CQ:image,file=base64://{base64.b64encode(image.read()).decode()}]'
+    msg = MessageSegment.text("今日词云：") + img_file
+    await bot.send(ev, msg) 
      
     #使用base64方式发送图片
     
@@ -134,8 +139,8 @@ def makeclouds(gid):
     content = [line.strip() for line in open(tycpath,encoding='utf-8').readlines()]
     stopwords.update(content)
     txt = " ".join(ls)
-    w = wordcloud.WordCloud(font_path=os.path.join(plugin_path,f"STKAITI.TTF"),\
-                            max_words=10000, width=1000, height=700,\
+    w = wordcloud.WordCloud(font_path=os.path.join(plugin_path,f"SimHei.ttf"),\
+                            max_words=10000, width=2560, height=1440,\
                             background_color='white',stopwords=stopwords,\
                             relative_scaling=0.5,min_word_length=2,\
                             color_func=random_color_func#调色
