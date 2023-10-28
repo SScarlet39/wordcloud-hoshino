@@ -16,11 +16,11 @@ import os
 sv = Service('词云', enable_on_default=True)
 
 
-plugin_path = '/home/flandre/桌面/xcw2/HoshinoBot/hoshino/modules/wordcloud-hoshino/'
+plugin_path = ''
 
-loadpath = '/home/flandre/桌面/xcw2/cqhttp/logs'	#此处填gocq的logs路径
-self_id = '2979430391'		#此处填机器人的QQ号
-load_in_path = '/home/flandre/桌面/xcw2/HoshinoBot/hoshino/modules/wordcloud-hoshino/wpics'
+loadpath = ''	#此处填gocq的logs路径
+self_id = ''		#此处填机器人的QQ号
+load_in_path = ''
 
 tycpath = os.path.join(plugin_path,f"tyc.txt")
 
